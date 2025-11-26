@@ -30,7 +30,7 @@ namespace TimViecLam.Repository
             secretKey = configuration.GetValue<string>("ApiSetting:Secret");
         }
 
- 
+
         //đăng nhập
         public async Task<AuthResult> LoginAsync(LoginRequest requestDto)
         {
@@ -48,6 +48,18 @@ namespace TimViecLam.Repository
                         Message = "Tài khoản hoặc mật khẩu không chính xác."
                     };
 
+                // --- Chỉ cho phép đăng nhập nếu trạng thái Active ---
+                if (user.Status != "Active")
+                {
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Status = 403,
+                        ErrorCode = "ACCOUNT_NOT_ACTIVE",
+                        Message = "Tài khoản của bạn hiện không ở trạng thái hoạt động."
+                    };
+                }
+
                 // --- Đăng nhập bằng Google ---
                 if (user.IsGoogleAccount)
                 {
@@ -60,7 +72,7 @@ namespace TimViecLam.Repository
                     };
                 }
 
-                // --- Kiểm tra password ---
+                // --- Kiểm tra mật khẩu ---
                 if (!BCrypt.Net.BCrypt.Verify(requestDto.Password, user.PasswordHash))
                 {
                     return new AuthResult
@@ -72,7 +84,7 @@ namespace TimViecLam.Repository
                     };
                 }
 
-                // sinh token JWT
+                // --- Sinh token ---
                 var key = Encoding.UTF8.GetBytes(secretKey);
                 var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -80,11 +92,11 @@ namespace TimViecLam.Repository
                 {
                     Subject = new ClaimsIdentity(new[]
                     {
-                        new Claim(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
-                        new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                        new Claim("role", user.Role),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                    }),
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("role", user.Role),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            }),
                     Expires = DateTime.UtcNow.AddMinutes(double.Parse(configuration["ApiSetting:ExpiresInMinutes"])),
                     Issuer = configuration["ApiSetting:Issuer"],
                     Audience = configuration["ApiSetting:Audience"],
@@ -116,6 +128,7 @@ namespace TimViecLam.Repository
                 };
             }
         }
+
 
         public async Task<AuthResult> RegisterAdminAsync(RegisterAdminRequest requestDto)
         {
@@ -297,7 +310,6 @@ namespace TimViecLam.Repository
                     Role = "Employer",
                     Status = "Active",
                     CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
                     IsGoogleAccount = false
                 };
 
@@ -400,6 +412,7 @@ namespace TimViecLam.Repository
                 return new AuthResult { IsSuccess = false, Status = 400, Message = "Token không hợp lệ hoặc đã hết hạn." };
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(requestDto.NewPassword);
+            user.UpdatedAt = DateTime.UtcNow;
             user.PasswordResetToken = null;
             user.PasswordResetTokenExpiry = null;
 

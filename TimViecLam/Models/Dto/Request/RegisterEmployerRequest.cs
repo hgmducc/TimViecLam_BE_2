@@ -27,8 +27,14 @@ namespace TimViecLam.Models.Dto.Request
         [StringLength(15)]
         public string? Phone { get; set; } // SĐT của người đăng ký (User)
 
-        // --- Thông tin cho Bảng [Employers] ---
+        [Required(ErrorMessage = "Ngày sinh là bắt buộc.")]
+        public DateOnly DateOfBirth { get; set; }
 
+        [Required(ErrorMessage = "Giới tính là bắt buộc.")]
+        public string Gender { get; set; } = string.Empty;
+        public string? address { get; set; }
+
+        // --- Thông tin cho Bảng [Employers] ---
         [Required(ErrorMessage = "Vui lòng nhập tên công ty.")]
         [StringLength(150)]
         public string CompanyName { get; set; } = null!;
