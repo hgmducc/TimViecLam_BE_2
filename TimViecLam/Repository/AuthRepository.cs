@@ -129,7 +129,7 @@ namespace TimViecLam.Repository
             }
         }
 
-
+        //đăng ký admin
         public async Task<AuthResult> RegisterAdminAsync(RegisterAdminRequest requestDto)
         {
             // Kiểm tra email đã tồn tại chưa

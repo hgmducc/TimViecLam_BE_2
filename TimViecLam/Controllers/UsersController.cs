@@ -19,6 +19,7 @@ namespace TimViecLam.Controllers
             _userRepository = userRepository;
         }
 
+        // lấy tất cả người dùng
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -60,6 +61,8 @@ namespace TimViecLam.Controllers
             }
         }
 
+
+        // lấy theo id của người dùng
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -110,6 +113,8 @@ namespace TimViecLam.Controllers
             }
         }
 
+
+        // sửa thông tin người dùng
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest request)
         {
@@ -179,6 +184,8 @@ namespace TimViecLam.Controllers
             }
         }
 
+
+        // xóa người dùng
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -212,6 +219,8 @@ namespace TimViecLam.Controllers
             }
         }
 
+
+        // cập nhật trạng thái tài khoản
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> UpdateUserStatus(int id, [FromBody] UpdateUserStatusRequest request)
         {

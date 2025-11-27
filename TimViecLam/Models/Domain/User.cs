@@ -35,6 +35,10 @@ namespace TimViecLam.Models.Domain
         [StringLength(255)]
         public string? Address { get; set; }
 
+        // Thêm trường Avatar
+        [StringLength(255)]
+        public string? Avatar { get; set; }
+
         [Required]
         [StringLength(20)]
         public string Role { get; set; } = null!;

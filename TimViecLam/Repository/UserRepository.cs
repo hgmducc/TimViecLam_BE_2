@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TimViecLam.Data;
 using TimViecLam.Models.Domain;
+using TimViecLam.Models.Dto.Response;
 using TimViecLam.Repository.IRepository;
 
 namespace TimViecLam.Repository
