@@ -8,34 +8,43 @@ namespace TimViecLam.Models.Domain
     {
         [Key]
         [ForeignKey("User")]
-        public int CandidateID { get; set; } // Đây LÀ UserID
-
-        // KHÔNG CẦN thuộc tính 'UserID' riêng biệt
+        public int CandidateID { get; set; }
 
         [StringLength(100)]
-        public string? HighestEducation { get; set; }
-
-        [StringLength(150)]
-        public string? Major { get; set; }
-
-        // CSDL cho phép NULL, nên dùng int? (nullable int)
-        public int? ExperienceYears { get; set; }
-
-        public string? Skills { get; set; } // nvarchar(MAX)
+        public string? DesiredPosition { get; set; }
 
         [Column(TypeName = "decimal(12, 2)")]
-        public decimal? ExpectedSalary { get; set; }
+        public decimal? DesiredSalary { get; set; }
 
-        [StringLength(30)]
-        public string? JobType { get; set; }
+        public int? YearsOfExperience { get; set; }
+
+        [StringLength(50)]
+        public string? JobType { get; set; } // Full-time, Part-time, Remote, Freelance
 
         [StringLength(255)]
         public string? DesiredLocation { get; set; }
 
+        // CV File
         [StringLength(255)]
-        public string? CVUrl { get; set; }
+        public string? CVFileName { get; set; }
 
-        // Thuộc tính điều hướng
+        [StringLength(255)]
+        public string? CVFilePath { get; set; }
+
+        public DateTime? CVUploadedAt { get; set; }
+
+        // Skills stored as JSON or comma-separated
+        public string? Skills { get; set; } // JSON: ["C#", "ASP.NET", "SQL"]
+
+        // Profile completeness
+        [Range(0, 100)]
+        public int ProfileCompleteness { get; set; } = 0;
+
+        public DateTime? LastUpdated { get; set; }
+
+        // Navigation properties
         public virtual User User { get; set; } = null!;
+        public virtual ICollection<Education> Educations { get; set; } = new List<Education>();
+        public virtual ICollection<Experience> Experiences { get; set; } = new List<Experience>();
     }
 }

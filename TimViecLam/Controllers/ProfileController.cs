@@ -100,7 +100,7 @@ namespace TimViecLam.Controllers
             }
 
             // Sửa phần check extension - giống như RegisterEmployer check PDF
-            var allowedExtensions = new[] { ". jpg", ".jpeg", ".png", ".gif" };
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
             var fileExtension = Path.GetExtension(avatar.FileName)?.ToLower();
 
             if (string.IsNullOrEmpty(fileExtension) || !allowedExtensions.Contains(fileExtension))

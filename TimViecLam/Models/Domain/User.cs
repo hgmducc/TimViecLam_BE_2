@@ -17,13 +17,11 @@ namespace TimViecLam.Models.Domain
         [StringLength(150)]
         public string Email { get; set; } = null!;
 
-        // Đánh dấu tài khoản đăng nhập bằng Google
         public bool IsGoogleAccount { get; set; } = false;
 
         [StringLength(15)]
         public string? Phone { get; set; }
 
-        // Google login sẽ để null
         [StringLength(255)]
         public string? PasswordHash { get; set; }
 
@@ -35,28 +33,28 @@ namespace TimViecLam.Models.Domain
         [StringLength(255)]
         public string? Address { get; set; }
 
-        // Thêm trường Avatar
         [StringLength(255)]
         public string? Avatar { get; set; }
 
         [Required]
         [StringLength(20)]
-        public string Role { get; set; } = null!;
+        public string Role { get; set; } = null!; // Admin, Candidate, Employer
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = null!;
+        public string Status { get; set; } = null!; // Active, Locked
 
         [StringLength(255)]
         public string? PasswordResetToken { get; set; }
 
         public DateTime? PasswordResetTokenExpiry { get; set; }
 
-        public Administrator? Administrator { get; set; }
-        public Employer? Employer { get; set; }
-        public Candidate? Candidate { get; set; }
+        // Navigation properties
+        public virtual Administrator? Administrator { get; set; }
+        public virtual Employer? Employer { get; set; }
+        public virtual Candidate? Candidate { get; set; }
     }
 }

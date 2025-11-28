@@ -8,19 +8,23 @@ namespace TimViecLam.Models.Domain
     {
         [Key]
         [ForeignKey("User")]
-        public int AdminID { get; set; } 
-
-        [StringLength(100)]
-        public string? Department { get; set; } 
-
-        [StringLength(100)]
-        public string? InternalTitle { get; set; } 
+        public int AdminID { get; set; }
 
         [Required]
         [StringLength(50)]
-        public string AdminRole { get; set; } = null!; 
+        public string AdminRole { get; set; } = null!; // SuperAdmin, Moderator, Support
 
-        // Thuộc tính điều hướng
+        [StringLength(100)]
+        public string? Department { get; set; }
+
+        [StringLength(100)]
+        public string? InternalTitle { get; set; }
+
+        public DateTime? LastLoginAt { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        // Navigation property
         public virtual User User { get; set; } = null!;
     }
 }

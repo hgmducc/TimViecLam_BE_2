@@ -75,6 +75,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseStaticFiles(); // truy cập vao file đã tải lên
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

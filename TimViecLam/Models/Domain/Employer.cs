@@ -6,20 +6,19 @@ namespace TimViecLam.Models.Domain
     [Table("Employers")]
     public class Employer
     {
-        [Key] // 1. Đây là Khóa Chính
-        [ForeignKey("User")] // 2. Nó CŨNG LÀ Khóa Ngoại trỏ đến User
-        public int EmployerID { get; set; } // Sẽ nhận giá trị của UserID
-
-        // 3. KHÔNG CẦN thuộc tính 'UserID' riêng biệt
+        [Key]
+        [ForeignKey("User")]
+        public int EmployerID { get; set; }
 
         [Required]
         [StringLength(150)]
-        public string CompanyName { get; set; } = null!; // NOT NULL
+        public string CompanyName { get; set; } = null!;
 
         [StringLength(255)]
         public string? CompanyWebsite { get; set; }
 
-        public string? CompanyDescription { get; set; } // nvarchar(MAX)
+        [Column(TypeName = "nvarchar(max)")]
+        public string? CompanyDescription { get; set; }
 
         [StringLength(50)]
         public string? TaxCode { get; set; }
@@ -32,7 +31,9 @@ namespace TimViecLam.Models.Domain
 
         [Required]
         [StringLength(30)]
-        public string VerificationStatus { get; set; } = null!; // NOT NULL
+        public string VerificationStatus { get; set; } = "Pending"; // Pending, Verified, Rejected
+
+        public DateTime? VerifiedAt { get; set; }
 
         [StringLength(100)]
         public string? ContactPerson { get; set; }
@@ -43,7 +44,21 @@ namespace TimViecLam.Models.Domain
         [StringLength(20)]
         public string? ContactPhone { get; set; }
 
-        // 4. Thuộc tính điều hướng ngược lại
+        // Company Size
+        [StringLength(50)]
+        public string? CompanySize { get; set; } // 1-50, 51-200, 201-500, 500+
+
+        [StringLength(100)]
+        public string? Industry { get; set; } // Ngành nghề
+
+        // Logo
+        [StringLength(255)]
+        public string? CompanyLogo { get; set; }
+
+        public DateTime? LastUpdated { get; set; }
+
+        // Navigation property
         public virtual User User { get; set; } = null!;
+        public virtual ICollection<JobPosting> JobPostings { get; set; } = new List<JobPosting>();
     }
 }
