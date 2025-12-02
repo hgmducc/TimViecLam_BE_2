@@ -11,7 +11,7 @@ namespace TimViecLam.Data
 
         // Core tables
         public DbSet<User> Users { get; set; }
-        public DbSet<Candidate> Candidates { get; set; } // Sửa từ Candidate -> Candidates
+        public DbSet<Candidate> Candidates { get; set; }
         public DbSet<Employer> Employers { get; set; }
         public DbSet<Administrator> Administrators { get; set; }
 
@@ -53,7 +53,7 @@ namespace TimViecLam.Data
             // ONE-TO-ONE RELATIONSHIPS (Shared Primary Key)
             // ==========================================
 
-            // User <-> Candidate (1:0..1)
+            // User <-> Candidate (1:0.. 1)
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Candidate)
                 .WithOne(c => c.User)
@@ -67,7 +67,7 @@ namespace TimViecLam.Data
                 .HasForeignKey<Employer>(e => e.EmployerID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // User <-> Administrator (1:0..1)
+            // User <-> Administrator (1:0.. 1)
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Administrator)
                 .WithOne(a => a.User)
@@ -155,6 +155,11 @@ namespace TimViecLam.Data
                 .Property(j => j.Status)
                 .HasDefaultValue("Draft");
 
+            // ✅ XÓA: DisplayStatus không còn tồn tại
+            // modelBuilder.Entity<JobPosting>()
+            //     .Property(j => j.DisplayStatus)
+            //     .HasDefaultValue("Active");
+
             modelBuilder.Entity<JobPosting>()
                 .Property(j => j.CreatedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
@@ -178,6 +183,10 @@ namespace TimViecLam.Data
             modelBuilder.Entity<JobPosting>()
                 .HasIndex(j => j.JobTitle);
 
+            // ✅ XÓA: Index DisplayStatus
+            // modelBuilder.Entity<JobPosting>()
+            //     .HasIndex(j => j.DisplayStatus);
+
             // ==========================================
             // JOB APPLICATION CONFIGURATION
             // ==========================================
@@ -190,14 +199,15 @@ namespace TimViecLam.Data
                 .Property(ja => ja.AppliedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
 
-            // JobPosting <-> JobApplications (1:N)
+            // JobPosting <-> JobApplications (1:N) - Cascade (CHỦ YẾU)
             modelBuilder.Entity<JobPosting>()
                 .HasMany(j => j.JobApplications)
                 .WithOne(ja => ja.JobPosting)
                 .HasForeignKey(ja => ja.JobPostingID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Candidate <-> JobApplications (1:N) - NO ACTION để tránh multiple cascade paths
+            // Candidate <-> JobApplications (1:N) - NO ACTION (PHỤ)
+            // ✅ ĐÚNG: Để NoAction tránh multiple cascade paths
             modelBuilder.Entity<JobApplication>()
                 .HasOne(ja => ja.Candidate)
                 .WithMany()
@@ -217,19 +227,19 @@ namespace TimViecLam.Data
                 .Property(sj => sj.SavedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
 
-            // Candidate <-> SavedJobs (1:N)
+            // Candidate <-> SavedJobs (1:N) - Cascade
             modelBuilder.Entity<SavedJob>()
                 .HasOne(sj => sj.Candidate)
                 .WithMany()
                 .HasForeignKey(sj => sj.CandidateID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // JobPosting <-> SavedJobs (1:N) - NO ACTION để tránh multiple cascade paths
+            // ✅ SỬA: JobPosting <-> SavedJobs: NoAction → Cascade
             modelBuilder.Entity<SavedJob>()
                 .HasOne(sj => sj.JobPosting)
                 .WithMany()
                 .HasForeignKey(sj => sj.JobPostingID)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.NoAction);  // ← ĐÚNG: NoAction
 
             // Unique constraint: Candidate chỉ lưu 1 lần cho 1 job
             modelBuilder.Entity<SavedJob>()

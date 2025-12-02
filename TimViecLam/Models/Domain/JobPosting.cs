@@ -61,13 +61,27 @@ namespace TimViecLam.Models.Domain
 
         public DateOnly? ApplicationDeadline { get; set; }
 
+        [StringLength(100)]
+        public string? WorkingHours { get; set; }
+
+        [StringLength(20)]
+        public string? GenderRequirement { get; set; }
+
+        public string? DetailedLocations { get; set; } // JSON
+        public string? RequiredSkills { get; set; }    // JSON
+        public string? Tags { get; set; }              // JSON
+
+        [StringLength(500)]
+        public string? CareerGrowth { get; set; }
         [Required]
         [StringLength(20)]
         public string Status { get; set; } = "Draft"; // Draft, Active, Closed, Expired
-
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? PublishedAt { get; set; }
+
+        // ✅ THÊM: Ngày đóng tuyển
+        public DateTime? ClosedAt { get; set; }
 
         public int ViewCount { get; set; } = 0;
         public int ApplicationCount { get; set; } = 0;

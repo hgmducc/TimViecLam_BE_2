@@ -20,6 +20,12 @@
         public int? YearsOfExperienceRequired { get; set; }
         public string? EducationLevel { get; set; }
         public int VacancyCount { get; set; }
+        public string? WorkingHours { get; set; }
+        public string? GenderRequirement { get; set; }
+        public List<LocationDetail>? DetailedLocations { get; set; }
+        public List<string>? RequiredSkills { get; set; }
+        public List<string>? Tags { get; set; }
+        public string? CareerGrowth { get; set; }
         public DateOnly? ApplicationDeadline { get; set; }
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }

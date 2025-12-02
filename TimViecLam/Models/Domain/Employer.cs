@@ -38,6 +38,9 @@ namespace TimViecLam.Models.Domain
         [StringLength(100)]
         public string? ContactPerson { get; set; }
 
+        [StringLength(500)]
+        public string? CompanyAddress { get; set; }
+
         [StringLength(150)]
         public string? ContactEmail { get; set; }
 

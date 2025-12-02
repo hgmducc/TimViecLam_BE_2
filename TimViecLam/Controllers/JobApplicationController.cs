@@ -50,7 +50,7 @@ namespace TimViecLam.Controllers
                     });
                 }
 
-                var allowedExtensions = new[] { ". pdf", ".doc", ".docx" };
+                var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
                 var fileExtension = Path.GetExtension(request.CVFile.FileName)?.ToLower();
                 if (string.IsNullOrEmpty(fileExtension) || !allowedExtensions.Contains(fileExtension))
                 {

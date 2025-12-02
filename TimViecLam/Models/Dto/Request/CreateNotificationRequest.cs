@@ -4,7 +4,7 @@ namespace TimViecLam.Models.Dto.Request
 {
     public class CreateNotificationRequest
     {
-        [Required(ErrorMessage = "UserID là bắt buộc. ")]
+        [Required(ErrorMessage = "UserID là bắt buộc.")]
         public int UserID { get; set; }
 
         [Required(ErrorMessage = "Tiêu đề là bắt buộc.")]
