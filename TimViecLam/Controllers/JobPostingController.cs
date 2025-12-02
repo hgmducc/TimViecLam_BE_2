@@ -107,7 +107,6 @@ namespace TimViecLam.Controllers
             return StatusCode(result.Status, result);
         }
 
-        // PATCH: api/jobs/{id}/status - Employer only
         [HttpPatch("{id}/status")]
         [Authorize(Roles = "Employer")]
         public async Task<IActionResult> UpdateJobStatus(int id, [FromBody] UpdateJobStatusRequest request)
@@ -124,6 +123,29 @@ namespace TimViecLam.Controllers
             }
 
             ApiResult<bool> result = await jobPostingRepository.UpdateJobStatusAsync(id, userId, request.Status);
+            return StatusCode(result.Status, result);
+        }
+
+        [HttpGet("{id}/related")]
+        public async Task<IActionResult> GetRelatedJobs(int id, [FromQuery] int count = 5)
+        {
+            var result = await jobPostingRepository.GetRelatedJobsAsync(id, count);
+            return StatusCode(result.Status, result);
+        }
+
+        [HttpGet("{id}/company")]
+        public async Task<IActionResult> GetJobCompanyInfo(int id)
+        {
+            var result = await jobPostingRepository.GetJobCompanyInfoAsync(id);
+            return StatusCode(result.Status, result);
+        }
+
+        [HttpGet("tag/{tagName}")]
+        public async Task<IActionResult> GetJobsByTag(
+            string tagName,
+            [FromQuery] JobPostingQueryParameters queryParams)
+        {
+            var result = await jobPostingRepository.GetJobsByTagAsync(tagName, queryParams);
             return StatusCode(result.Status, result);
         }
     }

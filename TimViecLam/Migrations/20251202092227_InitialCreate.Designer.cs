@@ -12,8 +12,8 @@ using TimViecLam.Data;
 namespace TimViecLam.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251127232331_CompleteJobPortalSchema")]
-    partial class CompleteJobPortalSchema
+    [Migration("20251202092227_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -169,6 +169,10 @@ namespace TimViecLam.Migrations
                     b.Property<string>("BusinessLicenseNumber")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CompanyAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("CompanyDescription")
                         .HasColumnType("nvarchar(max)");
@@ -351,10 +355,20 @@ namespace TimViecLam.Migrations
                     b.Property<string>("Benefits")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CareerGrowth")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("DetailedLocations")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EducationLevel")
                         .HasMaxLength(100)
@@ -366,6 +380,10 @@ namespace TimViecLam.Migrations
                     b.Property<string>("ExperienceLevel")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("GenderRequirement")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Industry")
                         .IsRequired()
@@ -394,6 +412,9 @@ namespace TimViecLam.Migrations
                     b.Property<DateTime?>("PublishedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("RequiredSkills")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Requirements")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -415,6 +436,9 @@ namespace TimViecLam.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasDefaultValue("Draft");
 
+                    b.Property<string>("Tags")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -427,6 +451,10 @@ namespace TimViecLam.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
+
+                    b.Property<string>("WorkingHours")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("YearsOfExperienceRequired")
                         .HasColumnType("int");

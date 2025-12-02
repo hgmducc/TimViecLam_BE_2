@@ -68,6 +68,7 @@ namespace TimViecLam.Repository
                             ContactEmail = employer.ContactEmail,
                             ContactPhone = employer.ContactPhone,
                             VerifiedAt = employer.VerifiedAt,
+                            CompanyAddress = employer.CompanyAddress,
                             TotalJobPostings = employer.JobPostings.Count,
                             ActiveJobPostings = employer.JobPostings.Count(j => j.Status == "Active")
                         }
@@ -108,6 +109,7 @@ namespace TimViecLam.Repository
                 employer.ContactPerson = request.ContactPerson;
                 employer.ContactEmail = request.ContactEmail;
                 employer.ContactPhone = request.ContactPhone;
+                employer.CompanyAddress = request.CompanyAddress;
                 employer.LastUpdated = DateTime.UtcNow;
 
                 await dbContext.SaveChangesAsync();

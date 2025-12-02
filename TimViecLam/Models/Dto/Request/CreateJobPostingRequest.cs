@@ -25,7 +25,7 @@ namespace TimViecLam.Models.Dto.Request
 
         [Required]
         [StringLength(50)]
-        public string JobType { get; set; } = string.Empty; // Full-time, Part-time, Remote
+        public string JobType { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100)]
@@ -47,5 +47,21 @@ namespace TimViecLam.Models.Dto.Request
         public int VacancyCount { get; set; } = 1;
 
         public DateOnly? ApplicationDeadline { get; set; }
+
+        // ✅ THÊM 6 FIELDS MỚI:
+        [StringLength(100)]
+        public string? WorkingHours { get; set; }
+
+        [RegularExpression("^(Nam|Nữ|Không yêu cầu)$", ErrorMessage = "Giới tính không hợp lệ")]
+        public string? GenderRequirement { get; set; }
+
+        public List<string>? DetailedAddresses { get; set; }
+
+        public List<string>? RequiredSkills { get; set; }
+
+        public List<string>? Tags { get; set; }
+
+        [StringLength(500)]
+        public string? CareerGrowth { get; set; }
     }
 }

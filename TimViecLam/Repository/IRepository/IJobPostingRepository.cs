@@ -13,5 +13,9 @@ namespace TimViecLam.Repository.IRepository
         Task<ApiResult<bool>> UpdateJobStatusAsync(int jobPostingId, int employerId, string status);
         Task<ApiResult<bool>> IncrementViewCountAsync(int jobPostingId);
         Task<PagedResult<JobPostingDto>> GetJobPostingsByEmployerAsync(int employerId, JobPostingQueryParameters queryParams);
+        Task<ApiResult<List<JobPostingDto>>> GetRelatedJobsAsync(int jobId, int count);
+        Task<ApiResult<EmployerProfileDto>> GetJobCompanyInfoAsync(int jobId);
+        Task<PagedResult<JobPostingDto>> GetJobsByTagAsync(string tagName, JobPostingQueryParameters queryParams);
+
     }
 }

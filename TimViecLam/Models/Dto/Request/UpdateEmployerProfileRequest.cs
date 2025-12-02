@@ -28,5 +28,8 @@ namespace TimViecLam.Models.Dto.Request
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]
         [StringLength(20)]
         public string? ContactPhone { get; set; }
+
+        [StringLength(500)]
+        public string? CompanyAddress { get; set; }
     }
 }

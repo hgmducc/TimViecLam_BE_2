@@ -16,7 +16,7 @@
         public string? SalaryType { get; set; }
         public DateOnly? ApplicationDeadline { get; set; }
         public string Status { get; set; } = string.Empty;
-
+        public List<string>? Tags { get; set; }
         public DateTime SavedAt { get; set; }
         public bool HasApplied { get; set; }
     }
