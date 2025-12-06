@@ -83,6 +83,17 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddCors(o =>
+{
+    o.AddPolicy("AllowAll", builder =>
+        builder.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+    );
+});
+
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -90,6 +101,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAll");
+
 app.UseStaticFiles(); // truy cập vao file đã tải lên
 
 app.UseHttpsRedirection();
