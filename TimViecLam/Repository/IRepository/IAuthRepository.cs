@@ -12,10 +12,8 @@ namespace TimViecLam.Repository.IRepository
         Task<AuthResult> RegisterAdminAsync(RegisterAdminRequest request);
         Task<AuthResult> ForgotPasswordAsync(ForgotPasswordRequest requestDto);
         Task<AuthResult> ResetPasswordAsync(ResetPasswordRequest requestDto);
-
-        //Task<AuthResult> LoginWithGoogleAsync(ClaimsPrincipal claims);
-        //Task<AuthResult> RegisterWithGoogleAsync(ClaimsPrincipal claims, string role = "Candidate");
-
+        Task<AuthResult> LoginWithGoogleAsync(GoogleLoginRequest requestDto);
+        Task<AuthResult> RegisterWithGoogleAsync(GoogleRegisterRequest requestDto);
         Task<AuthResult> LoginAsync(LoginRequest requestDto);
     }
 }

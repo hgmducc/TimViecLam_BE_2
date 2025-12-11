@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+﻿using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -360,7 +360,6 @@ namespace TimViecLam.Repository
 
             if (user == null)
             {
-                // Email chưa đăng ký
                 return new AuthResult
                 {
                     IsSuccess = false,
@@ -369,34 +368,43 @@ namespace TimViecLam.Repository
                 };
             }
 
-            // Email tồn tại -  tạo token reset
+            // Tạo token reset
             user.PasswordResetToken = Guid.NewGuid().ToString();
             user.PasswordResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
             await dbContext.SaveChangesAsync();
 
             var resetLink = $"https://trangdoimak.com/reset-password?token={user.PasswordResetToken}";
 
-            string emailBody = $@"
-            <div style='font-family: Arial, sans-serif; line-height: 1.5;'>
-                <h2>Đặt lại mật khẩu</h2>
-                <p>Chào {user.FullName},</p>
-                <p>Bạn hoặc ai đó đã yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</p>
-                <p>Nhấn nút bên dưới để đặt lại mật khẩu. Link này sẽ hết hạn sau 15 phút.</p>
-                <a href='{resetLink}' 
-                   style='display: inline-block; padding: 12px 24px; margin: 10px 0; 
-                          font-size: 16px; color: white; background-color: #007BFF; 
-                          text-decoration: none; border-radius: 6px;'>Đặt lại mật khẩu</a>
-                <p>Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
-                <p>Trân trọng,<br/>TimViecLam Team</p>
-            </div>";
+            string emailSubject = "Khôi phục tài khoản TimViecLam";
 
-            await emailService.SendEmailAsync(user.Email, "Đặt lại mật khẩu TimViecLam", emailBody);
+            string emailBody = $@"
+                <div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+                    <h2 style='color:#007BFF;'>Khôi phục tài khoản của bạn</h2>
+                    <p>Xin chào <strong>{user.FullName}</strong>,</p>
+                    <p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn.</p>
+                    <p>Vui lòng nhấn vào nút bên dưới để đặt lại mật khẩu.  
+                       <br/>Liên kết này sẽ hết hạn sau <strong>15 phút</strong>.</p>
+
+                    <a href='{resetLink}'
+                       style='display:inline-block;padding:12px 24px;margin:16px 0;
+                              background-color:#007BFF;color:white;font-size:16px;
+                              text-decoration:none;border-radius:6px;'>
+                       Đặt lại mật khẩu
+                    </a>
+
+                    <p>Nếu bạn không yêu cầu thao tác này, vui lòng bỏ qua email.</p>
+
+                    <br/>
+                    <p>Trân trọng,<br/><strong>Đội ngũ TimViecLam</strong></p>
+                </div>";
+
+            await emailService.SendEmailAsync(user.Email, emailSubject, emailBody);
 
             return new AuthResult
             {
                 IsSuccess = true,
                 Status = 200,
-                Message = "Link đặt lại mật khẩu đã được gửi đến email của bạn."
+                Message = "Chúng tôi đã gửi email hướng dẫn khôi phục tài khoản đến địa chỉ email của bạn."
             };
         }
 
@@ -419,5 +427,288 @@ namespace TimViecLam.Repository
             await dbContext.SaveChangesAsync();
             return new AuthResult { IsSuccess = true, Status = 200, Message = "Đặt lại mật khẩu thành công." };
         }
+
+        public async Task<AuthResult> LoginWithGoogleAsync(GoogleLoginRequest requestDto)
+        {
+            try
+            {
+                // --- Xác thực Google Token ---
+                GoogleJsonWebSignature.Payload? payload;
+                try
+                {
+                    var settings = new GoogleJsonWebSignature.ValidationSettings
+                    {
+                        Audience = new[] { configuration["GoogleAuth:ClientId"] }
+                    };
+                    payload = await GoogleJsonWebSignature.ValidateAsync(requestDto.GoogleToken, settings);
+                }
+                catch (Exception ex)
+                {
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Status = 400,
+                        ErrorCode = "INVALID_GOOGLE_TOKEN",
+                        Message = "Google token không hợp lệ hoặc đã hết hạn."
+                    };
+                }
+
+                // --- Tìm user theo email ---
+                var user = await dbContext.Users
+                    .FirstOrDefaultAsync(u => u.Email == payload.Email);
+
+                if (user == null)
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Status = 404,
+                        ErrorCode = "USER_NOT_FOUND",
+                        Message = "Tài khoản chưa được đăng ký.  Vui lòng đăng ký trước."
+                    };
+
+                // --- Kiểm tra tài khoản có phải Google không ---
+                if (!user.IsGoogleAccount)
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Status = 400,
+                        ErrorCode = "NOT_GOOGLE_ACCOUNT",
+                        Message = "Email này đã đăng ký bằng mật khẩu.  Vui lòng đăng nhập bằng email và mật khẩu."
+                    };
+
+                // --- Kiểm tra trạng thái tài khoản ---
+                if (user.Status != "Active")
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Status = 403,
+                        ErrorCode = "ACCOUNT_NOT_ACTIVE",
+                        Message = "Tài khoản của bạn hiện không ở trạng thái hoạt động."
+                    };
+
+                // --- Sinh token ---
+                var key = Encoding.UTF8.GetBytes(secretKey);
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[]
+                    {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("role", user.Role),
+                new Claim(JwtRegisteredClaimNames. Jti, Guid.NewGuid().ToString())
+            }),
+                    Expires = DateTime.UtcNow.AddMinutes(double.Parse(configuration["ApiSetting:ExpiresInMinutes"])),
+                    Issuer = configuration["ApiSetting:Issuer"],
+                    Audience = configuration["ApiSetting:Audience"],
+                    SigningCredentials = new SigningCredentials(
+                        new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature
+                    )
+                };
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                string jwtToken = tokenHandler.WriteToken(token);
+
+                return new AuthResult
+                {
+                    IsSuccess = true,
+                    Status = 200,
+                    Message = "Đăng nhập bằng Google thành công.",
+                    Token = jwtToken
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResult
+                {
+                    IsSuccess = false,
+                    Status = 500,
+                    ErrorCode = "SERVER_ERROR",
+                    Message = "Đã xảy ra lỗi máy chủ:  " + ex.Message
+                };
+            }
+        }
+
+        // ==========================================
+        // ✅ ĐĂNG KÝ BẰNG GOOGLE
+        // ==========================================
+        public async Task<AuthResult> RegisterWithGoogleAsync(GoogleRegisterRequest requestDto)
+        {
+            try
+            {
+                // --- Xác thực Google Token ---
+                GoogleJsonWebSignature.Payload? payload;
+                try
+                {
+                    var settings = new GoogleJsonWebSignature.ValidationSettings
+                    {
+                        Audience = new[] { configuration["GoogleAuth: ClientId"] }
+                    };
+                    payload = await GoogleJsonWebSignature.ValidateAsync(requestDto.GoogleToken, settings);
+                }
+                catch (Exception ex)
+                {
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Status = 400,
+                        ErrorCode = "INVALID_GOOGLE_TOKEN",
+                        Message = "Google token không hợp lệ hoặc đã hết hạn."
+                    };
+                }
+
+                // --- Kiểm tra email đã tồn tại chưa ---
+                bool emailExists = await dbContext.Users.AnyAsync(u => u.Email == payload.Email);
+                if (emailExists)
+                    return new AuthResult
+                    {
+                        IsSuccess = false,
+                        Status = 409,
+                        ErrorCode = "EMAIL_EXISTS",
+                        Message = "Email này đã được đăng ký."
+                    };
+
+                // --- Tạo User ---
+                var newUser = new User
+                {
+                    FullName = payload.Name,
+                    Email = payload.Email,
+                    Avatar = payload.Picture,
+                    Role = requestDto.Role,
+                    Status = "Active",
+                    IsGoogleAccount = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                // --- Tạo Candidate hoặc Employer ---
+                if (requestDto.Role == "Candidate")
+                {
+                    var newCandidate = new Candidate();
+                    newUser.Candidate = newCandidate;
+                }
+                else if (requestDto.Role == "Employer")
+                {
+                    // Validate employer fields
+                    if (string.IsNullOrWhiteSpace(requestDto.CompanyName))
+                        return new AuthResult
+                        {
+                            IsSuccess = false,
+                            Status = 400,
+                            ErrorCode = "COMPANY_NAME_REQUIRED",
+                            Message = "Tên công ty là bắt buộc khi đăng ký Employer."
+                        };
+
+                    // --- Upload business license file nếu có ---
+                    string? savedLicenseFilePath = null;
+
+                    if (requestDto.BusinessLicenseFile != null && requestDto.BusinessLicenseFile.Length > 0)
+                    {
+                        // Validate file
+                        if (requestDto.BusinessLicenseFile.Length > 5 * 1024 * 1024)
+                            return new AuthResult
+                            {
+                                IsSuccess = false,
+                                Status = 400,
+                                ErrorCode = "FILE_TOO_LARGE",
+                                Message = "File quá lớn. Vui lòng tải lên file <= 5MB."
+                            };
+
+                        if (!requestDto.BusinessLicenseFile.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                            return new AuthResult
+                            {
+                                IsSuccess = false,
+                                Status = 400,
+                                ErrorCode = "INVALID_FILE_TYPE",
+                                Message = "File không hợp lệ.  Chỉ nhận file PDF."
+                            };
+
+                        // Upload file
+                        string rootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                        string folderPath = Path.Combine(rootPath, "Uploads", "BusinessLicenses");
+
+                        if (!Directory.Exists(folderPath))
+                            Directory.CreateDirectory(folderPath);
+
+                        string fileName = $"{Guid.NewGuid()}_{requestDto.BusinessLicenseFile.FileName}";
+                        string filePath = Path.Combine(folderPath, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await requestDto.BusinessLicenseFile.CopyToAsync(stream);
+                        }
+
+                        savedLicenseFilePath = $"/Uploads/BusinessLicenses/{fileName}";
+                    }
+
+                    var newEmployer = new Employer
+                    {
+                        CompanyName = requestDto.CompanyName,
+                        CompanyWebsite = requestDto.CompanyWebsite,
+                        TaxCode = requestDto.TaxCode,
+                        BusinessLicenseFile = savedLicenseFilePath,
+                        CompanyDescription = "",
+                        VerificationStatus = "Pending",
+                        ContactPerson = requestDto.ContactPerson ?? payload.Name,
+                        ContactEmail = requestDto.ContactEmail ?? payload.Email,
+                        ContactPhone = requestDto.ContactPhone,
+                        CompanyAddress = requestDto.CompanyAddress
+                    };
+
+                    newUser.Employer = newEmployer;
+                }
+
+                // --- Lưu vào database ---
+                await dbContext.Users.AddAsync(newUser);
+                await dbContext.SaveChangesAsync();
+
+                // --- Sinh token ---
+                var key = Encoding.UTF8.GetBytes(secretKey);
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[]
+                    {
+                new Claim(JwtRegisteredClaimNames.Sub, newUser.UserID.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, newUser.Email),
+                new Claim("role", newUser. Role),
+                new Claim(JwtRegisteredClaimNames. Jti, Guid.NewGuid().ToString())
+            }),
+                    Expires = DateTime.UtcNow.AddMinutes(double.Parse(configuration["ApiSetting:ExpiresInMinutes"])),
+                    Issuer = configuration["ApiSetting: Issuer"],
+                    Audience = configuration["ApiSetting:Audience"],
+                    SigningCredentials = new SigningCredentials(
+                        new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature
+                    )
+                };
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                string jwtToken = tokenHandler.WriteToken(token);
+
+                return new AuthResult
+                {
+                    IsSuccess = true,
+                    Status = 201,
+                    Message = requestDto.Role == "Employer"
+                        ? "Đăng ký Employer bằng Google thành công.  Vui lòng chờ xét duyệt."
+                        : "Đăng ký Candidate bằng Google thành công.",
+                    Token = jwtToken
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResult
+                {
+                    IsSuccess = false,
+                    Status = 500,
+                    ErrorCode = "SERVER_ERROR",
+                    Message = "Đã xảy ra lỗi máy chủ: " + ex.Message
+                };
+            }
+        }
+
     }
 }

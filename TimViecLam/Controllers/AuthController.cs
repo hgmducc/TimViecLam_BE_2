@@ -124,41 +124,40 @@ namespace TimViecLam.Controllers
         }
 
 
-
-
-
-
-
-        /*          ĐANG LỖI - CHƯA SỬA ĐƯỢC PHẦN NÀY BỎ QUA
-        [HttpGet("google-login")]
-        public IActionResult GoogleLogin()
+        // POST: api/auth/google/login
+        [HttpPost("google/login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
         {
-            var properties = new AuthenticationProperties { RedirectUri = "/api/auth/google-callback" };
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
+            }
+
+            AuthResult result = await authRepository.LoginWithGoogleAsync(request);
+            return StatusCode(result.Status, result);
         }
 
-        [HttpGet("google-callback")]
-        public async Task<IActionResult> GoogleCallback()
+        // POST: api/auth/google/register
+        [HttpPost("google/register")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> GoogleRegister([FromForm] GoogleRegisterRequest request)
         {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-            if (!result.Succeeded)
-                return BadRequest("Google authentication failed.");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
+            }
 
-            var authResult = await authRepository.LoginWithGoogleAsync(result.Principal);
-            return Ok(authResult);
+            if (request.Role == "Employer")
+            {
+                if (string.IsNullOrWhiteSpace(request.CompanyName))
+                {
+                    return BadRequest(new { message = "Tên công ty là bắt buộc khi đăng ký Employer." });
+                }
+            }
+
+            AuthResult result = await authRepository.RegisterWithGoogleAsync(request);
+            return StatusCode(result.Status, result);
         }
-
-        [HttpPost("fake-google-login")]
-        public async Task<IActionResult> FakeGoogleLogin([FromBody] string email)
-        {
-            var claims = new ClaimsPrincipal(new ClaimsIdentity(new[] {
-        new Claim(ClaimTypes.Email, email)
-    }, "FakeGoogle"));
-
-            var authResult = await authRepository.RegisterWithGoogleAsync(claims, "Candidate");
-            return Ok(authResult);
-        }
-        */
 
     }
 }

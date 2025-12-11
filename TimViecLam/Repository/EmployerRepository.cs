@@ -297,6 +297,12 @@ namespace TimViecLam.Repository
                         FullName = e.User.FullName,
                         Email = e.User.Email,
                         Phone = e.User.Phone,
+
+                        // ✅ THÊM 3 FIELDS NÀY (đã có từ fix trước):
+                        DateOfBirth = e.User.DateOfBirth,
+                        Gender = e.User.Gender,
+                        Address = e.User.Address,
+
                         Role = e.User.Role,
                         Status = e.User.Status,
                         CreatedAt = e.User.CreatedAt,
@@ -305,8 +311,24 @@ namespace TimViecLam.Repository
                             EmployerID = e.EmployerID,
                             CompanyName = e.CompanyName,
                             CompanyWebsite = e.CompanyWebsite,
+
+                            // ✅ THÊM TẤT CẢ FIELDS CÒN THIẾU:
+                            CompanyDescription = e.CompanyDescription,
+                            CompanyLogo = e.CompanyLogo,
+                            CompanySize = e.CompanySize,
+                            Industry = e.Industry,
+                            TaxCode = e.TaxCode,
+                            BusinessLicenseNumber = e.BusinessLicenseNumber,
+                            BusinessLicenseFile = e.BusinessLicenseFile,
+
                             VerificationStatus = e.VerificationStatus,
                             VerifiedAt = e.VerifiedAt,
+
+                            ContactPerson = e.ContactPerson,
+                            ContactEmail = e.ContactEmail,
+                            ContactPhone = e.ContactPhone,
+                            CompanyAddress = e.CompanyAddress,
+
                             TotalJobPostings = e.JobPostings.Count,
                             ActiveJobPostings = e.JobPostings.Count(j => j.Status == "Active")
                         }
@@ -330,7 +352,7 @@ namespace TimViecLam.Repository
                 {
                     IsSuccess = false,
                     Status = 500,
-                    Message = "Đã xảy ra lỗi: " + ex.Message
+                    Message = "Đã xảy ra lỗi:  " + ex.Message
                 };
             }
         }

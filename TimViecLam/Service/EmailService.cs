@@ -17,10 +17,21 @@
                 EnableSsl = true
             };
 
-            var mail = new System.Net.Mail.MailMessage(_config["Email:SmtpUser"], to, subject, body)
+            // ⚡ Quan trọng: thêm Display Name ở đây
+            var fromAddress = new System.Net.Mail.MailAddress(
+                _config["Email:SmtpUser"],
+                "Hệ Thống Tìm Kiếm Việc Làm" 
+            );
+
+            var mail = new System.Net.Mail.MailMessage()
             {
+                From = fromAddress,
+                Subject = subject,
+                Body = body,
                 IsBodyHtml = true
             };
+
+            mail.To.Add(to);
 
             await client.SendMailAsync(mail);
         }
