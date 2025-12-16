@@ -66,7 +66,6 @@ namespace TimViecLam.Repository
                         Address = candidate.User.Address,
                         Role = candidate.User.Role,
                         AvatarUrl = candidate.User.Avatar,
-                        IsGoogleAccount = candidate.User.IsGoogleAccount,
                         Status = candidate.User.Status,
                         CreatedAt = candidate.User.CreatedAt,
                         UpdatedAt = candidate.User.UpdatedAt,

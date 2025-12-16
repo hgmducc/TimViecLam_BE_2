@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TimViecLam.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class TaoBang : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,6 @@ namespace TimViecLam.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    IsGoogleAccount = table.Column<bool>(type: "bit", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     PasswordHash = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: true),

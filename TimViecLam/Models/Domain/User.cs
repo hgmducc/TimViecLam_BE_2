@@ -17,8 +17,6 @@ namespace TimViecLam.Models.Domain
         [StringLength(150)]
         public string Email { get; set; } = null!;
 
-        public bool IsGoogleAccount { get; set; } = false;
-
         [StringLength(15)]
         public string? Phone { get; set; }
 

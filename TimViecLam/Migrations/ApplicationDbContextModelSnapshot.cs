@@ -586,9 +586,6 @@ namespace TimViecLam.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<bool>("IsGoogleAccount")
-                        .HasColumnType("bit");
-
                     b.Property<string>("PasswordHash")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");

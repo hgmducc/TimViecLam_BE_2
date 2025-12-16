@@ -5,7 +5,6 @@
         public int UserID { get; set; }
         public string FullName { get; set; } = null!;
         public string Email { get; set; } = null!;
-        public bool IsGoogleAccount { get; set; }
         public string? Phone { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public string? Gender { get; set; }

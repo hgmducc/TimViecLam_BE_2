@@ -49,7 +49,6 @@ namespace TimViecLam.Repository
                         Address = user.Address,
                         Role = user.Role,
                         AvatarUrl = user.Avatar,
-                        IsGoogleAccount = user.IsGoogleAccount,
                         CreatedAt = user.CreatedAt,
                         UpdatedAt = user.UpdatedAt
                     }
@@ -123,7 +122,6 @@ namespace TimViecLam.Repository
                         Address = user.Address,
                         Role = user.Role,
                         AvatarUrl = user.Avatar,
-                        IsGoogleAccount = user.IsGoogleAccount,
                         CreatedAt = user.CreatedAt,
                         UpdatedAt = user.UpdatedAt
                     }
@@ -155,16 +153,6 @@ namespace TimViecLam.Repository
                         Status = 404,
                         ErrorCode = "USER_NOT_FOUND",
                         Message = "Không tìm thấy người dùng."
-                    };
-
-                // Kiểm tra tài khoản Google
-                if (user.IsGoogleAccount)
-                    return new ProfileResult
-                    {
-                        IsSuccess = false,
-                        Status = 400,
-                        ErrorCode = "GOOGLE_ACCOUNT",
-                        Message = "Tài khoản Google không thể đổi mật khẩu."
                     };
 
                 // Kiểm tra mật khẩu hiện tại
@@ -272,7 +260,6 @@ namespace TimViecLam.Repository
                         Address = user.Address,
                         Role = user.Role,
                         AvatarUrl = savedAvatarPath,
-                        IsGoogleAccount = user.IsGoogleAccount,
                         CreatedAt = user.CreatedAt,
                         UpdatedAt = user.UpdatedAt
                     }

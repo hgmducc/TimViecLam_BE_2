@@ -12,8 +12,8 @@ using TimViecLam.Data;
 namespace TimViecLam.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251202092227_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251216152838_TaoBang")]
+    partial class TaoBang
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -588,9 +588,6 @@ namespace TimViecLam.Migrations
                     b.Property<string>("Gender")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
-
-                    b.Property<bool>("IsGoogleAccount")
-                        .HasColumnType("bit");
 
                     b.Property<string>("PasswordHash")
                         .HasMaxLength(255)

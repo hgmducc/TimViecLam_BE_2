@@ -50,7 +50,6 @@ namespace TimViecLam.Repository
                         Address = employer.User.Address,
                         Role = employer.User.Role,
                         AvatarUrl = employer.User.Avatar,
-                        IsGoogleAccount = employer.User.IsGoogleAccount,
                         Status = employer.User.Status,
                         CreatedAt = employer.User.CreatedAt,
                         UpdatedAt = employer.User.UpdatedAt,

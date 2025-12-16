@@ -123,41 +123,5 @@ namespace TimViecLam.Controllers
             return StatusCode(result.Status, result);
         }
 
-
-        // POST: api/auth/google/login
-        [HttpPost("google/login")]
-        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
-            }
-
-            AuthResult result = await authRepository.LoginWithGoogleAsync(request);
-            return StatusCode(result.Status, result);
-        }
-
-        // POST: api/auth/google/register
-        [HttpPost("google/register")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> GoogleRegister([FromForm] GoogleRegisterRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { message = "Dữ liệu không hợp lệ." });
-            }
-
-            if (request.Role == "Employer")
-            {
-                if (string.IsNullOrWhiteSpace(request.CompanyName))
-                {
-                    return BadRequest(new { message = "Tên công ty là bắt buộc khi đăng ký Employer." });
-                }
-            }
-
-            AuthResult result = await authRepository.RegisterWithGoogleAsync(request);
-            return StatusCode(result.Status, result);
-        }
-
     }
 }
